@@ -197,7 +197,7 @@ class sapConnection:
     #obtiene todas las subareas del area de produccion
     def get_areas(self):
       self.selectArray.clear()
-      sql = f"SELECT oprc.\"PrcCode\",oprc.\"PrcName\" FROM SBO_TECNO_PRODUCCION.ITT1 itt1 INNER JOIN SBO_TECNO_PRODUCCION.OPRC oprc ON itt1.\"OcrCode2\" = oprc.\"PrcCode\" INNER JOIN SBO_TECNO_PRODUCCION.OITM oit ON itt1.\"Father\" = oit.\"ItemCode\" GROUP BY oprc.\"PrcCode\", oprc.\"PrcName\";"
+      sql = f"SELECT \"PrcCode\", \"PrcName\" FROM SBO_TECNO_PRODUCCION.OPRC WHERE \"PrcCode\" LIKE '%20001%' AND \"DimCode\" = 2 AND \"PrcName\" != 'FORJA' AND \"PrcName\" != 'TALADROS' ORDER BY \"PrcCode\";"
       self.openConnection()
       self.cursor.execute(sql)
       for row in self.cursor:
