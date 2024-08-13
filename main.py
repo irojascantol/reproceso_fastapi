@@ -1,7 +1,7 @@
+import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.routers.articulos_materiales import articulos_router
-import uvicorn
 from app.routers import reporte_rechazados, areas_router, almacen, simulacion_reproceso, usuario
  
 origins = ["*"]
@@ -22,3 +22,7 @@ app.include_router(areas_router.areas_router)
 app.include_router(almacen.almacen_router)
 app.include_router(simulacion_reproceso.simulacion_router)
 app.include_router(usuario.usuario_router)
+
+
+if __name__ == "__main__":
+    uvicorn.run("main:app", host="0.0.0.0", port=8080, reload=True)
