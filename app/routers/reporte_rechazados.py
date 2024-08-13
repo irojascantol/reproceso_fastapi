@@ -10,7 +10,6 @@ from starlette.responses import RedirectResponse
 sys.path.insert(1, 'C:/Users/irojas/Desktop/Pruebas/repro_proyecto/repro_api/app/herramientas')
 sys.path.insert(2, 'C:/Users/irojas/Desktop/Pruebas/repro_proyecto/repro_api/app/data')
 from connection import sapConnection, dbConnection
-from product_area import data_pr_sa
 
 
 router = APIRouter(
@@ -64,16 +63,6 @@ async def getareas():
         "data": newData
     }
 
-@router.get("/reports/")
-# async def mirror(item: Item):
-async def reports():
-    data = sapobj.getFailsOF()
-    newData = list(map(getReportDataFormat, data))
-    return {
-        "data": newData
-    }
-
-
 @router.get("/material_repro/")
 # async def mirror(item: Item):
 async def getOdMaterials(odParameter: str, ofParameter: str):
@@ -122,20 +111,6 @@ def getSubAreas(x):
     "nombre": x[1],
     }
 
-
-def getReportDataFormat(x):
-#   sap_data = sapobj.getDataProductionByOF(of=x[1])
-  return {"subarea": data_pr_sa[x[1]] if (x[1] in data_pr_sa) else 'NO DEFINIDO',
-      "of_sap": x[0],
-      "product": x[1],
-      "bad_prod": x[3],
-      "good_prod": x[4],
-      "total_prod": x[5],
-      "start_date": x[6].strftime("%d-%b-%Y") if not(x[6] is None) else 'None',
-      "final_date": (x[7].strftime("%d-%b-%Y") if not(x[7] is None) else 'En proceso'),
-      "ware_house": x[8],
-      "productTitle": x[2]
-      }
 
 def getMaterialDatabyOf(x):
     return {

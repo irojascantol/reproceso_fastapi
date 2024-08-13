@@ -17,11 +17,7 @@ async def validateRol(usuarioid: str = 'XXXX', rol_id: int = 4):
     returnedValue = (True if not(isOk is None) else False)
     return {
         "data": returnedValue,
-    }
-
-
-#aqui tiene que traer la lista de simulaciones que le pertenecen
-# def get_format_cost_center(x):
+}
 
 
 

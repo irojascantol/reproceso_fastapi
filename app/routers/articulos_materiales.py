@@ -1,8 +1,14 @@
 import sys
+import json
 from fastapi import APIRouter
+from typing import List
+from pydantic import BaseModel
 sys.path.insert(1, 'C:/Users/irojas/Desktop/Pruebas/repro_proyecto/repro_api/app/herramientas')
 sys.path.insert(2, 'C:/Users/irojas/Desktop/Pruebas/repro_proyecto/repro_api/app/data')
 from app.herramientas.connection import sapConnection, dbConnection
+
+class SaMembers(BaseModel):
+    members: List[str]
 
 
 articulos_router = APIRouter(
@@ -11,13 +17,18 @@ articulos_router = APIRouter(
 sapobj = sapConnection()
 dbobj = dbConnection()
 
-@articulos_router.get("/")
-async def get_articulo(area: str = ""):
-    data = sapobj.get_Articulo_Area(area.upper())
-    newData = list(map(return_getArticulo, enumerate(data)))
-    return {
-        "data": newData
-    }   
+@articulos_router.post("/")
+async def get_articulo(subarea: SaMembers):
+    if bool(len(subarea.members)):
+        data = sapobj.get_Articulo_Area(subarea.members)
+        newData = list(map(return_getArticulo, enumerate(data)))
+        return {
+            "data": newData
+        }
+    else:
+        return {
+            "data": []
+        }
 
 def return_getArticulo(data):
     index, value = data
@@ -28,15 +39,13 @@ def return_getArticulo(data):
     }
 
 @articulos_router.get("/material_repro/")
-async def getOdMaterials(odParameter: str = 'PP1117000001', nameWare: str = 'ENSAMBLE DE CERRADURAS', isAll: bool = True):
-    data = sapobj.getMaterialsByAD(odParameter, nameWare)
+async def getOdMaterials(odParameter: str = 'PP1117000001', subareaName: str = 'ENSAMBLE DE CERRADURAS', isAll: bool = True):
+    data = sapobj.getMaterialsByAD(odParameter)
     newData = list(map(getMaterialDatabyOd, data))
     newData.sort(key=lambda x: (int(x['order'].split(".")[1])+int(x['order'].split(".")[0])))
-    newData[0]["baseCost"] = newData[-1]["costbyOne"]
-    newData[0]["costbyOne"] = newData[-1]["costbyOne"]
+    newData[0]["baseCost"] = newData[0]["costbyOne"]
     newData[0]["qtyRejected"] = newData[-1]["qtyRejected"]
     newData[0]["whName"] = newData[-1]["whName"]
-    
     return ({"data": newData[0]} if not isAll else {"data": newData[1:]})
 
 def getMaterialDatabyOd(x):
@@ -53,11 +62,16 @@ def getMaterialDatabyOd(x):
     "whName": x[9],
     }
 
-@articulos_router.get("/materials/")
-async def getOdMaterials(subArea: str):
-    data = sapobj.get_material_subarea(subArea)
-    newData = getMaterialDatabySubArea(data)
-    return ({"data": newData})
+@articulos_router.post("/materials/")
+async def getOdMaterials(prcCode: SaMembers):
+    if bool(len(prcCode.members)):
+        data = sapobj.get_material_subarea(prcCode.members)
+        newData = getMaterialDatabySubArea(data)
+        return {"data": newData}
+    else:
+        return {
+            "data": []
+        }
 
 def getMaterialDatabySubArea(x):
     myDict = {}
